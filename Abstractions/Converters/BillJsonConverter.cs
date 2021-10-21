@@ -9,10 +9,7 @@ namespace Filuet.Hardware.CashAcceptors.Abstractions.Converters
 {
     public class BillJsonConverter : JsonConverter<Denomination>
     {
-        public override Denomination Read(
-                    ref Utf8JsonReader reader,
-                    Type typeToConvert,
-                    JsonSerializerOptions options)
+        public override Denomination Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             string value = reader.GetString();
             string[] x = value.Trim().Split(new char[] {' '}, StringSplitOptions.RemoveEmptyEntries);
@@ -22,9 +19,7 @@ namespace Filuet.Hardware.CashAcceptors.Abstractions.Converters
             if (!uint.TryParse(x[0], out uint amount))
                 throw new ArgumentException($"Invalid denomination amount {value}");
 
-            Currency currency = EnumHelpers.GetValueFromCode<Currency>(x[1]);
-
-            return new Denomination(amount, currency);
+            return new Denomination(amount, EnumHelpers.GetValueFromCode<Currency>(x[1]));
         }
 
         public override void Write(
