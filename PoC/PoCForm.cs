@@ -22,6 +22,12 @@ namespace PoC
         private ICashDevice _cashAcceptor;
         private DeviceType? _currentlySelectedSevice;
 
+        private Channel GetCurrentChannel
+            => payoutStockListBox.SelectedItem != null ? (Channel)payoutStockListBox.SelectedItem : null;
+
+        private Device GetCurrentDevice
+            => deviceComboBox.SelectedItem != null ? (Device)deviceComboBox.SelectedItem : null;
+
         public PoCForm()
         {
             InitializeComponent();
@@ -29,10 +35,10 @@ namespace PoC
 
         private void PoCForm_Load(object sender, EventArgs e)
         {
-            deviceComboBox.Items.AddRange(EnumHelpers.GetValues<DeviceType>().Select(x=> new Device { Type = x }).ToArray());
+            deviceComboBox.Items.AddRange(EnumHelpers.GetValues<DeviceType>().Select(x => new Device { Type = x }).ToArray());
 
-          //  if (deviceComboBox.Items.Count > 0)
-           //     deviceComboBox.SelectedIndex = 0;
+            //  if (deviceComboBox.Items.Count > 0)
+            //     deviceComboBox.SelectedIndex = 0;
         }
 
         private void PoCForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -46,6 +52,8 @@ namespace PoC
         private void deviceComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             Device selectedDevice = deviceComboBox.SelectedItem as Device;
+
+            payout2CashboxButton.Visible = getRoutesButton.Visible = selectedDevice.Type == DeviceType.ITL;
 
             if (_cashAcceptor != null && selectedDevice.Type != _currentlySelectedSevice)
                 _cashAcceptor.Stop();
@@ -109,7 +117,7 @@ namespace PoC
                 string result = string.Empty;
                 // Define all currencies
                 List<Currency> detectedCurrencies =
-                    _cashAcceptor.GetPayoutStock().GroupBy(x => x.denomination.Currency).Select(x=>x.Key).Distinct().ToList();
+                    _cashAcceptor.GetPayoutStock().GroupBy(x => x.denomination.Currency).Select(x => x.Key).Distinct().ToList();
 
                 detectedCurrencies.AddRange(
                     _cashAcceptor.GetCashboxStock().GroupBy(x => x.Key.Currency).Select(x => x.Key).Distinct());
@@ -124,13 +132,14 @@ namespace PoC
                     result += $"{new Denomination((uint)(atThePayout + atTheCashbox), curr)}; ";
                 }
 
-                totalTextBox.Text = result.Substring(0, (result.Length >=2 ? result.Length - 2: result.Length));
+                totalTextBox.Text = result.Substring(0, (result.Length >= 2 ? result.Length - 2 : result.Length));
             }));
         }
 
         private ICashDevice RunITLSsp()
         {
-            ICashDevice itl = new ITLCashValidator(setup => {
+            ICashDevice itl = new ITLCashValidator(setup =>
+            {
                 setup.WithComPort(3).WithSspAddress(0)
                 .WithIlluminationMode(CashValidatorIlluminationMode.New(CashValidatorState.Receiving, CashValidatorIlluminationKind.Solid, Color.Green))
                 .WithIlluminationMode(CashValidatorIlluminationMode.New(CashValidatorState.Idle, CashValidatorIlluminationKind.Solid, Color.FromArgb(0, 10, 0)))
@@ -147,7 +156,8 @@ namespace PoC
                 .WithBillUpperLimitInPayout(new Denomination(5000, Currency.RussianRuble), 3);
             });
 
-            itl.OnEvent += (sender, e) => Invoke(new MethodInvoker(delegate () {
+            itl.OnEvent += (sender, e) => Invoke(new MethodInvoker(delegate ()
+            {
                 if (richTextBox1 != null)
                     richTextBox1.Text = $"ITL {DateTime.Now.ToString("HH:mm:ss")} {e.Level.GetCode().ToLower()}: {e.Message} {Environment.NewLine}{richTextBox1.Text}";
             }));
@@ -160,22 +170,57 @@ namespace PoC
 
         private ICashDevice RunJ2000()
         {
-            ICashDevice itl = new J2000CoinMechanism(setup => {
+            ICashDevice itl = new J2000CoinMechanism(setup =>
+            {
                 setup.WithRoutes(true, true)
                 .WithChannel(2, new Denomination(1, Currency.RussianRuble), 5)
                 .WithChannel(3, new Denomination(2, Currency.RussianRuble), 5)
                 .WithChannel(4, new Denomination(5, Currency.RussianRuble), 5)
                 .WithChannel(6, new Denomination(10, Currency.RussianRuble), 5);
             });
-            
-            itl.OnEvent += (sender, e) => Invoke(new MethodInvoker(delegate () {
+
+            itl.OnEvent += (sender, e) => Invoke(new MethodInvoker(delegate ()
+            {
                 if (richTextBox1 != null)
                     richTextBox1.Text = $"J2000 {DateTime.Now.ToString("HH:mm:ss")} {e.Level.GetCode().ToLower()}: {e.Message} {Environment.NewLine}{richTextBox1.Text}";
             }));
-            itl.OnDispensed += (sender, e)
-                => UpdateBalance();
-            itl.OnInserted += (sender, e)
-                => UpdateBalance();
+
+            Action<Denomination, bool> onMoving = (nominal, dispensed) =>
+            {
+                Invoke(new MethodInvoker(delegate ()
+                {
+                    for (int i = 0; i < payoutStockListBox.Items.Count; i++)
+                    {
+                        Channel channel = (Channel)payoutStockListBox.Items[i];
+                        if (channel.Denomination == nominal)
+                        {
+                            if (dispensed)
+                                channel.Count--;
+                            else
+                            {
+                                if (channel.Count >= channel.MaxCount)
+                                {
+                                    for (int j = 0; j < cashboxStockListBox.Items.Count; j++)
+                                    {
+                                        Channel channelStock = (Channel)cashboxStockListBox.Items[j];
+                                        if (channelStock.Denomination == nominal)
+                                        {
+                                            channelStock.Count++;
+                                            cashboxStockListBox.Items[j] = channelStock;
+                                        }
+                                    }
+                                }
+                                else channel.Count++;
+                            }
+
+                            payoutStockListBox.Items[i] = channel;
+                        }
+                    }
+                }));
+            };
+
+            itl.OnDispensed += (sender, e) => onMoving(e.Dispensed, true);
+            itl.OnInserted += (sender, e) => onMoving(e.Inserted, false);
 
             itl.Run();
             return itl;
@@ -192,18 +237,32 @@ namespace PoC
             _cashAcceptor.Reset();
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            _cashAcceptor.Extract(new Denomination { Currency = Currency.RussianRuble, Amount = 2 }, 1);
-        }
-        private void button2_Click(object sender, EventArgs e)
+        private void getRoutesButton_Click(object sender, EventArgs e)
         {
             IDictionary<Denomination, CashRoute> routes = _cashAcceptor.GetRoutes();
 
             foreach (var x in routes)
-            {
                 richTextBox1.Text = $"{DateTime.Now.ToString("HH:mm:ss")} info: {x.Key} => {x.Value.GetCode()}{Environment.NewLine}{richTextBox1.Text}";
-            }
+        }
+
+        private void extractButton_Click(object sender, EventArgs e)
+        {
+            Channel toextract = GetCurrentChannel;
+            if (toextract != null && toextract.Count > 0)
+                _cashAcceptor.Extract(toextract.Denomination, 1);
+
+            RefreshExtractButton();
+        }
+
+        private void RefreshExtractButton()
+        {
+            Channel toextract = GetCurrentChannel;
+            extractButton.Enabled = toextract?.Count > 0;
+        }
+
+        private void payoutStockListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            RefreshExtractButton();
         }
     }
 }

@@ -98,10 +98,23 @@ namespace Filuet.Hardware.CashAcceptors.Periphery.Jofemar.J2000
                 OnReset?.Invoke(this, new CashAcceptorResetArgs { });
         }
 
-        public void Extract(Denomination bill, uint quantity)
+        public void Extract(Denomination bill, ushort quantity)
         {
-            WriteAndRead((byte)JofemarIpcDeviceAddress.Device,
-                J2000IpcCommands.GiveTheChangeByCoins(4/*5 rub*/, (int)quantity), out byte[] response);
+            var channel = _settings.Channels.FirstOrDefault(x => x.nominal == bill);
+
+            if (channel.channelId > 0)
+            {
+                for (ushort i = 0; i < quantity; i++)
+                {
+                    bool result = WriteAndRead((byte)JofemarIpcDeviceAddress.Device,
+                        J2000IpcCommands.GiveTheChangeByCoins(channel.channelId, quantity), out byte[] response); // 4/*5 rub*/
+
+                    if (result)
+                        OnDispensed?.Invoke(this, new CashAcceptorOnDispensedArgs { Dispensed = bill });
+                    else OnEvent?.Invoke(this, CashAcceptorLogArgs.Error($"An error occured when extracting {bill}"));
+                }
+            }
+            else throw new Exception($"Unknown denomination {bill}");
         }
 
         public void PushAllToCashBox()
@@ -117,7 +130,16 @@ namespace Filuet.Hardware.CashAcceptors.Periphery.Jofemar.J2000
             return _info.Channels.Select(x => (x.Nominal, x.Level, _settings.Channels.FirstOrDefault(c=>c.nominal == x.Nominal).maxlevel)).ToList();
         }
 
-        public IDictionary<Denomination, ushort> GetCashboxStock() => _info.CashboxStock;
+        public IDictionary<Denomination, ushort> GetCashboxStock()
+        {
+            if (!_info.CashboxStock.Any())
+            {
+                foreach (var i in _info.Channels) // probably upload from cache?
+                    _info.CashboxStock.Add(i.Nominal, (ushort)0);
+            }
+
+            return _info.CashboxStock;
+        }
 
         public IDictionary<Denomination, CashRoute> GetRoutes()
         {

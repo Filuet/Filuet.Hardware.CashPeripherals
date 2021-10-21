@@ -23,7 +23,7 @@ namespace Filuet.Hardware.CashAcceptors.Abstractions
 
         void Reset();
 
-        void Extract(Denomination bill, uint quantity);
+        void Extract(Denomination bill, ushort quantity);
 
         void PushAllToCashBox();
 
