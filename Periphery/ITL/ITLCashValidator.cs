@@ -8,9 +8,8 @@ using Filuet.Hardware.CashAcceptors.Abstractions;
 using Filuet.Hardware.CashAcceptors.Abstractions.Enums;
 using Filuet.Hardware.CashAcceptors.Abstractions.Events;
 using Filuet.Hardware.CashAcceptors.Abstractions.Models;
-using Filuet.Hardware.CashAcceptors.Common;
-using Filuet.Hardware.CashAcceptors.Common.Helpers;
 using Filuet.Hardware.CashAcceptors.Common.Ssp;
+using Filuet.Infrastructure.Abstractions.Helpers;
 using ITLlib;
 
 namespace Filuet.Hardware.CashAcceptors.Periphery.ITL

@@ -1,5 +1,5 @@
 ﻿using Filuet.Hardware.CashAcceptors.Abstractions.Models;
-using Filuet.Hardware.CashAcceptors.Common.Helpers;
+using Filuet.Infrastructure.Abstractions.Helpers;
 
 namespace Filuet.Hardware.CashAcceptors.Periphery.ITL.Models
 {

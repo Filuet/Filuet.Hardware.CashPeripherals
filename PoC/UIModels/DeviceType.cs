@@ -1,4 +1,4 @@
-﻿using Filuet.Hardware.CashAcceptors.Common.Attributes;
+﻿using Filuet.Infrastructure.Attributes;
 
 namespace PoC.UIModels
 {

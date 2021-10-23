@@ -1,10 +1,11 @@
 ﻿using Filuet.Hardware.CashAcceptors.Abstractions;
 using Filuet.Hardware.CashAcceptors.Abstractions.Enums;
 using Filuet.Hardware.CashAcceptors.Abstractions.Models;
-using Filuet.Hardware.CashAcceptors.Common.Helpers;
 using Filuet.Hardware.CashAcceptors.Periphery.ITL;
 using Filuet.Hardware.CashAcceptors.Periphery.ITL.Models;
 using Filuet.Hardware.CashAcceptors.Periphery.Jofemar.J2000;
+using Filuet.Infrastructure.Abstractions.Enums;
+using Filuet.Infrastructure.Abstractions.Helpers;
 using PoC.UIModels;
 using System;
 using System.Collections.Generic;

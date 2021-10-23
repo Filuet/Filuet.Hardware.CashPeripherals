@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Filuet.Infrastructure.Abstractions" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Common\Filuet.Hardware.CashAcceptors.Common.csproj" />
     <ProjectReference Include="..\Periphery\ITL\Filuet.Hardware.CashAcceptors.Periphery.ITL.csproj" />
     <ProjectReference Include="..\Periphery\Jofemar\Filuet.Hardware.CashAcceptors.Periphery.Jofemar.csproj" />

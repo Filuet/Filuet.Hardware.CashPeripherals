@@ -1,5 +1,5 @@
-﻿using Filuet.Hardware.CashAcceptors.Abstractions.Enums;
-using Filuet.Hardware.CashAcceptors.Common.Helpers;
+﻿using Filuet.Infrastructure.Abstractions.Enums;
+using Filuet.Infrastructure.Abstractions.Helpers;
 
 namespace Filuet.Hardware.CashAcceptors.Abstractions.Models
 {
@@ -30,6 +30,10 @@ namespace Filuet.Hardware.CashAcceptors.Abstractions.Models
         public static bool operator ==(Denomination lhs, Denomination rhs) => lhs.Equals(rhs);
 
         public static bool operator !=(Denomination lhs, Denomination rhs) => !(lhs == rhs);
+
+        public static bool operator ==(Denomination obj1, uint value) => obj1.Amount == value;
+
+        public static bool operator !=(Denomination obj1, uint value) => !(obj1 == value);
 
         public override string ToString() => $"{Amount} {Currency.GetCode()}";
     }

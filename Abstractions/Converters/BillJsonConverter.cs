@@ -1,6 +1,7 @@
 ﻿using Filuet.Hardware.CashAcceptors.Abstractions.Enums;
 using Filuet.Hardware.CashAcceptors.Abstractions.Models;
-using Filuet.Hardware.CashAcceptors.Common.Helpers;
+using Filuet.Infrastructure.Abstractions.Enums;
+using Filuet.Infrastructure.Abstractions.Helpers;
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
