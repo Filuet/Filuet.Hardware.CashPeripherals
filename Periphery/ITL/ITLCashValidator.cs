@@ -221,7 +221,7 @@ namespace Filuet.Hardware.CashAcceptors.Periphery.ITL
             }
         }
 
-        public void Extract(Denomination bill, uint quantity)
+        public void Extract(Denomination bill, ushort quantity)
         {
             lock (_command)
             {
