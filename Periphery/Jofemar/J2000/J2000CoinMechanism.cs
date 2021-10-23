@@ -14,17 +14,14 @@ namespace Filuet.Hardware.CashAcceptors.Periphery.Jofemar.J2000
 {
     public partial class J2000CoinMechanism : ICashDevice
     {
-        public CashDeviceState State { get; private set; }
-
         public event EventHandler<CashAcceptorOnInsertedArgs> OnInserted;
         public event EventHandler<CashAcceptorOnDispensedArgs> OnDispensed;
         public event EventHandler<CashAcceptorLogArgs> OnEvent;
         public event EventHandler<CashAcceptorResetArgs> OnReset;
         public event EventHandler<CashAcceptorOnFullCashbox> OnFullCashbox;
 
-        private int _messageCounter;
-
-        private object _cmdLocker = new object();
+        public CashDeviceMode Mode => CashDeviceMode.Both;
+        public CashDeviceState State { get; private set; }
 
         public J2000CoinMechanism(Action<J2000CoinMechanismSettingsBuilder> setupAction)
         {
@@ -176,7 +173,10 @@ namespace Filuet.Hardware.CashAcceptors.Periphery.Jofemar.J2000
         //        return;
         //    }
         //}
-     
+
+        private int _messageCounter;
+        private object _cmdLocker = new object();
+
         private readonly J2000CoinMechanismSettings _settings;
         private readonly J2000CoinMechanismInfo _info;
         private readonly FTD2XX_NET.FTDI _ftdi;

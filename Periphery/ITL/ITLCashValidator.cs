@@ -22,44 +22,7 @@ namespace Filuet.Hardware.CashAcceptors.Periphery.ITL
         public event EventHandler<CashAcceptorResetArgs> OnReset;
         public event EventHandler<CashAcceptorOnFullCashbox> OnFullCashbox;
 
-        private readonly ITLCashValidatorSettings _settings;
-        private ITLCashValidatorInfo _info;
-        private bool _isRunning = false;
-
-        /// <summary>
-        /// A pointer to the command structure, this struct is filled with info and then compiled into a packet by the library and sent to the validator
-        /// </summary>
-        private SSP_COMMAND _command { get; set; } = new SSP_COMMAND();
-
-        /// <summary>
-        /// Access to ssp variables the pointer which gives access to library functions such as open com port, send command etc
-        /// </summary>
-        private SSPComms SSPComms { get; set; } = new SSPComms();
-
-        private SSP_COMMAND_INFO SSPCommangInfo { get; set; } = new SSP_COMMAND_INFO();
-
-
-        /// <summary>
-        /// A variable to hold the type of validator, this variable is initialised using the setup request command
-        /// </summary>
-        private char UnitType { get; set; } = (char)0xFF;
-
-        /// <summary>
-        /// Integer to hold total number of Hold messages to be issued before releasing note from escrow
-        /// </summary>
-        private int HoldNumber { get; set; } = 0;
-
-        /// <summary>
-        /// Bool to hold flag set to true if a note is being held in escrow
-        /// </summary>
-        private bool NoteHeld { get; set; } = false;
-
-        /// <summary>
-        /// Integer to hold number of hold messages still to be issued
-        /// </summary>
-        private int HoldCount = 0;
-
-        private SSP_KEYS keys { get; set; } = new SSP_KEYS();
+        public CashDeviceMode Mode => CashDeviceMode.Both;
 
         public CashDeviceState State { get; private set; }
 
@@ -312,5 +275,44 @@ namespace Filuet.Hardware.CashAcceptors.Periphery.ITL
 
             return result;
         }
+
+        private readonly ITLCashValidatorSettings _settings;
+        private ITLCashValidatorInfo _info;
+        private bool _isRunning = false;
+
+        /// <summary>
+        /// A pointer to the command structure, this struct is filled with info and then compiled into a packet by the library and sent to the validator
+        /// </summary>
+        private SSP_COMMAND _command { get; set; } = new SSP_COMMAND();
+
+        /// <summary>
+        /// Access to ssp variables the pointer which gives access to library functions such as open com port, send command etc
+        /// </summary>
+        private SSPComms SSPComms { get; set; } = new SSPComms();
+
+        private SSP_COMMAND_INFO SSPCommangInfo { get; set; } = new SSP_COMMAND_INFO();
+
+
+        /// <summary>
+        /// A variable to hold the type of validator, this variable is initialised using the setup request command
+        /// </summary>
+        private char UnitType { get; set; } = (char)0xFF;
+
+        /// <summary>
+        /// Integer to hold total number of Hold messages to be issued before releasing note from escrow
+        /// </summary>
+        private int HoldNumber { get; set; } = 0;
+
+        /// <summary>
+        /// Bool to hold flag set to true if a note is being held in escrow
+        /// </summary>
+        private bool NoteHeld { get; set; } = false;
+
+        /// <summary>
+        /// Integer to hold number of hold messages still to be issued
+        /// </summary>
+        private int HoldCount = 0;
+
+        private SSP_KEYS keys { get; set; } = new SSP_KEYS();
     }
 }

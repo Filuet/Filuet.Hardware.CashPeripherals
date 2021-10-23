@@ -9,6 +9,8 @@ namespace Filuet.Hardware.CashAcceptors.Abstractions
 {
     public interface ICashDevice
     {
+        CashDeviceMode Mode { get; }
+
         CashDeviceState State { get; }
 
         event EventHandler<CashAcceptorOnInsertedArgs> OnInserted;
@@ -16,7 +18,7 @@ namespace Filuet.Hardware.CashAcceptors.Abstractions
         event EventHandler<CashAcceptorLogArgs> OnEvent;
         event EventHandler<CashAcceptorResetArgs> OnReset;
         event EventHandler<CashAcceptorOnFullCashbox> OnFullCashbox;
-            
+
         Task Run();
 
         void Stop();
