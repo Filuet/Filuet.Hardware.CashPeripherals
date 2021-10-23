@@ -129,12 +129,6 @@ namespace Filuet.ASC.Kiosk.OnBoard.Cashbox.Core
             }
         }
 
-
-        public void Stop()
-        {
-            //CashDevice.StopPayment();
-        }
-
         private readonly IEnumerable<ICashDevice> _cashDevices;
 
         private delegate void onChange(object sender, CashAcceptorOnDispensedArgs e);
