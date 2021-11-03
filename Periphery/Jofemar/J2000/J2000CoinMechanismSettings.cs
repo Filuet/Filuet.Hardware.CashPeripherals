@@ -1,4 +1,4 @@
-﻿using Filuet.Hardware.CashAcceptors.Abstractions.Models;
+﻿using Filuet.Infrastructure.Abstractions.Models;
 using System.Collections.Generic;
 
 namespace Filuet.Hardware.CashAcceptors.Periphery.Jofemar.J2000

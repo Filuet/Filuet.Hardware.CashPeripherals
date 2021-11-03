@@ -42,15 +42,17 @@ namespace Filuet.Hardware.CashAcceptors.Periphery.ITL
             if (_isGlowing)
                 _highlightCancelTokenSource.Cancel();
 
-            CashValidatorIlluminationMode mode = _settings[state];
+            CashValidatorIlluminationMode illuminationMode = _settings[state];
+
+            if (illuminationMode == null)
+                return;
 
             _isGlowing = true;
-
-            switch (mode.IlluminationKind)
+            switch (illuminationMode.IlluminationKind)
             {
                 case CashValidatorIlluminationKind.Solid:
                 default:
-                    SetLight(mode.Color.Value);
+                    SetLight(illuminationMode.Color.Value);
                     break;
             }
 

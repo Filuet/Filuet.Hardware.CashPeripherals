@@ -1,11 +1,12 @@
-﻿using Filuet.Hardware.CashAcceptors.Abstractions.Converters;
-using Filuet.Hardware.CashAcceptors.Abstractions.Enums;
+﻿using Filuet.Hardware.CashAcceptors.Abstractions.Enums;
 using Filuet.Hardware.CashAcceptors.Abstractions.Events;
 using Filuet.Hardware.CashAcceptors.Abstractions.Models;
 using Filuet.Hardware.CashAcceptors.Common.Ssp;
 using Filuet.Hardware.CashAcceptors.Periphery.ITL.Models;
+using Filuet.Infrastructure.Abstractions.Converters;
 using Filuet.Infrastructure.Abstractions.Enums;
 using Filuet.Infrastructure.Abstractions.Helpers;
+using Filuet.Infrastructure.Abstractions.Models;
 using ITLlib;
 using System;
 using System.IO;
@@ -147,9 +148,8 @@ namespace Filuet.Hardware.CashAcceptors.Periphery.ITL
                     result.UnitDataList.Add(new ITLChannel
                     {
                         Channel = (byte)(i + 1), // Number
-                        Nominal = new Denomination
-                        {
-                            Amount = (uint)BitConverter.ToInt32(_command.ResponseData, (int)(index + (result.NumberOfChannels * 3) + (i * 4))) * result.ValueMultiplier,
+                        Nominal = new Denomination {                        
+                            Amount = BitConverter.ToInt32(_command.ResponseData, (int)(index + (result.NumberOfChannels * 3) + (i * 4))) ,
                             Currency = EnumHelpers.GetValueFromCode<Currency>(new string(new char[] { (char)_command.ResponseData[index + (i * 3)], (char)_command.ResponseData[(index + 1) + (i * 3)], (char)_command.ResponseData[(index + 2) + (i * 3)] }))
                         },
                         Multiplier = result.ValueMultiplier
@@ -203,7 +203,7 @@ namespace Filuet.Hardware.CashAcceptors.Periphery.ITL
                     string cached = File.ReadAllText(cacheFile);
 
                     JsonSerializerOptions options = new JsonSerializerOptions();
-                    options.Converters.Add(new BillJsonConverter());
+                    options.Converters.Add(new DenominationJsonConverter());
 
                     StockCacheDto cache = JsonSerializer.Deserialize<StockCacheDto>(cached, options);
                     if (cache != null)
@@ -534,7 +534,7 @@ namespace Filuet.Hardware.CashAcceptors.Periphery.ITL
                             if (!string.IsNullOrWhiteSpace(_info.SerialNumber))
                             {
                                 JsonSerializerOptions options = new JsonSerializerOptions();
-                                options.Converters.Add(new BillJsonConverter());
+                                options.Converters.Add(new DenominationJsonConverter());
                                 File.WriteAllText(cacheFile, JsonSerializer.Serialize(new StockCacheDto(_info.CashboxStock), options));
                             }
                         }
@@ -728,7 +728,7 @@ namespace Filuet.Hardware.CashAcceptors.Periphery.ITL
             lock (_command)
             {
                 _command.CommandData[0] = SspCommand.SSP_CMD_SET_DENOMINATION_ROUTE;
-                _command.CommandData[1] = (byte)(route == CashRoute.Stacker ? 0x01 : 0x00);
+                _command.CommandData[1] = (byte)(route == CashRoute.Stacker ? 0x00 : 0x01);
 
                 // get the note as a byte array
                 byte[] b = BitConverter.GetBytes((int)note.Amount * _info.ValueMultiplier);

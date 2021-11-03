@@ -1,6 +1,6 @@
 ﻿using Filuet.Hardware.CashAcceptors.Abstractions.Enums;
 using Filuet.Hardware.CashAcceptors.Abstractions.Events;
-using Filuet.Hardware.CashAcceptors.Abstractions.Models;
+using Filuet.Infrastructure.Abstractions.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

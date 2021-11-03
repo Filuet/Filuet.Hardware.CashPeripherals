@@ -4,9 +4,11 @@ namespace PoC.UIModels
 {
     public enum DeviceType 
     {
-        [Code("ITL cash acceptor")]
-        ITL = 1,
+        [Code("ITL smart payout")]
+        ITLSmartPayout = 1,
+        [Code("ITL smart hopper")]
+        ITLSmartHopper = 2,
         [Code("J2000 coin mechanism")]
-        J2000 = 2
+        J2000 = 3
     }
 }

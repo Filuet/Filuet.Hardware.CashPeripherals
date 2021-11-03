@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Filuet.Infrastructure.Abstractions.Models;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace Filuet.Hardware.CashAcceptors.Abstractions.Models
@@ -21,5 +22,7 @@ namespace Filuet.Hardware.CashAcceptors.Abstractions.Models
 
         [JsonPropertyName("qty")]
         public ushort Quantity { get; set; }
+
+        public override string ToString() => $"{Note}: {Quantity}";
     }
 }

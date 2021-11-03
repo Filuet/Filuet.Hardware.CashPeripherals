@@ -1,4 +1,4 @@
-﻿using Filuet.Hardware.CashAcceptors.Abstractions.Models;
+﻿using Filuet.Infrastructure.Abstractions.Models;
 using System;
 
 namespace Filuet.Hardware.CashAcceptors.Abstractions.Events

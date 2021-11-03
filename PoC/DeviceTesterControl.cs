@@ -1,17 +1,16 @@
 ﻿using Filuet.Hardware.CashAcceptors.Abstractions;
 using Filuet.Hardware.CashAcceptors.Abstractions.Enums;
-using Filuet.Hardware.CashAcceptors.Abstractions.Models;
 using Filuet.Hardware.CashAcceptors.Periphery.ITL;
 using Filuet.Hardware.CashAcceptors.Periphery.ITL.Models;
 using Filuet.Hardware.CashAcceptors.Periphery.Jofemar.J2000;
 using Filuet.Infrastructure.Abstractions.Enums;
 using Filuet.Infrastructure.Abstractions.Helpers;
+using Filuet.Infrastructure.Abstractions.Models;
 using PoC.UIModels;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -53,7 +52,7 @@ namespace PoC
         {
             Device selectedDevice = deviceComboBox.SelectedItem as Device;
 
-            payout2CashboxButton.Visible = getRoutesButton.Visible = selectedDevice.Type == DeviceType.ITL;
+            payout2CashboxButton.Visible = getRoutesButton.Visible = selectedDevice.Type == DeviceType.ITLSmartPayout;
 
             if (_cashAcceptor != null && selectedDevice.Type != _currentlySelectedSevice)
                 _cashAcceptor.Stop();
@@ -63,8 +62,11 @@ namespace PoC
 
             switch (selectedDevice.Type)
             {
-                case DeviceType.ITL:
-                    _cashAcceptor = RunITLSsp();
+                case DeviceType.ITLSmartPayout:
+                    _cashAcceptor = RunITLSmartPayout();
+                    break;
+                case DeviceType.ITLSmartHopper:
+                    _cashAcceptor = RunITLSmartHopper();
                     break;
                 case DeviceType.J2000:
                     _cashAcceptor = RunJ2000();
@@ -126,8 +128,8 @@ namespace PoC
 
                 foreach (Currency curr in detectedCurrencies)
                 {
-                    long atThePayout = _cashAcceptor.GetPayoutStock().Where(x => x.denomination.Currency == curr).Sum(x => x.denomination.Amount * x.qty);
-                    long atTheCashbox = _cashAcceptor.GetCashboxStock().Where(x => x.Key.Currency == curr).Sum(x => x.Key.Amount * x.Value);
+                    decimal atThePayout = _cashAcceptor.GetPayoutStock().Where(x => x.denomination.Currency == curr).Sum(x => x.denomination.Amount * x.qty);
+                    decimal atTheCashbox = _cashAcceptor.GetCashboxStock().Where(x => x.Key.Currency == curr).Sum(x => x.Key.Amount * x.Value);
 
                     result += $"{new Denomination((uint)(atThePayout + atTheCashbox), curr)}; ";
                 }
@@ -136,7 +138,7 @@ namespace PoC
             }));
         }
 
-        private ICashDevice RunITLSsp()
+        private ICashDevice RunITLSmartPayout()
         {
             ICashDevice itl = new ITLCashValidator(setup =>
             {
@@ -146,14 +148,43 @@ namespace PoC
                 .WithIlluminationMode(CashValidatorIlluminationMode.New(CashValidatorState.Error, CashValidatorIlluminationKind.Solid, Color.FromArgb(180, 0, 0)))
                 .WithIlluminationMode(CashValidatorIlluminationMode.New(CashValidatorState.Extracting, CashValidatorIlluminationKind.Solid, Color.Yellow))
                 .SetMaxBillsInPayout(70)
-                .WithBillUpperLimitInPayout(new Denomination(10, Currency.RussianRuble), 3)
-                .WithBillUpperLimitInPayout(new Denomination(50, Currency.RussianRuble), 2)
-                .WithBillUpperLimitInPayout(new Denomination(100, Currency.RussianRuble), 3)
-                .WithBillUpperLimitInPayout(new Denomination(200, Currency.RussianRuble), 3)
-                .WithBillUpperLimitInPayout(new Denomination(500, Currency.RussianRuble), 3)
-                .WithBillUpperLimitInPayout(new Denomination(1000, Currency.RussianRuble), 3)
-                .WithBillUpperLimitInPayout(new Denomination(2000, Currency.RussianRuble), 3)
-                .WithBillUpperLimitInPayout(new Denomination(5000, Currency.RussianRuble), 3);
+                .WithDenominationUpperLimitInPayout(new Denomination(10, Currency.RussianRuble), 3)
+                .WithDenominationUpperLimitInPayout(new Denomination(50, Currency.RussianRuble), 2)
+                .WithDenominationUpperLimitInPayout(new Denomination(100, Currency.RussianRuble), 3)
+                .WithDenominationUpperLimitInPayout(new Denomination(200, Currency.RussianRuble), 3)
+                .WithDenominationUpperLimitInPayout(new Denomination(500, Currency.RussianRuble), 3)
+                .WithDenominationUpperLimitInPayout(new Denomination(1000, Currency.RussianRuble), 3)
+                .WithDenominationUpperLimitInPayout(new Denomination(2000, Currency.RussianRuble), 3)
+                .WithDenominationUpperLimitInPayout(new Denomination(5000, Currency.RussianRuble), 3);
+            });
+
+            itl.OnEvent += (sender, e) => Invoke(new MethodInvoker(delegate ()
+            {
+                if (richTextBox1 != null)
+                    richTextBox1.Text = $"ITL {DateTime.Now.ToString("HH:mm:ss")} {e.Level.GetCode().ToLower()}: {e.Message} {Environment.NewLine}{richTextBox1.Text}";
+            }));
+            itl.OnDispensed += (sender, e) => UpdateBalance();
+            itl.OnInserted += (sender, e) => UpdateBalance();
+
+            itl.Run();
+            return itl;
+        }
+
+
+        private ICashDevice RunITLSmartHopper()
+        {
+            ICashDevice itl = new ITLCashValidator(setup =>
+            {
+                setup.WithComPort(3).WithSspAddress(16)
+                .SetMaxBillsInPayout(70)
+                .WithDenominationUpperLimitInPayout(new Denomination(10, Currency.RussianRuble), 3)
+                .WithDenominationUpperLimitInPayout(new Denomination(50, Currency.RussianRuble), 2)
+                .WithDenominationUpperLimitInPayout(new Denomination(100, Currency.RussianRuble), 3)
+                .WithDenominationUpperLimitInPayout(new Denomination(200, Currency.RussianRuble), 3)
+                .WithDenominationUpperLimitInPayout(new Denomination(500, Currency.RussianRuble), 3)
+                .WithDenominationUpperLimitInPayout(new Denomination(1000, Currency.RussianRuble), 3)
+                .WithDenominationUpperLimitInPayout(new Denomination(2000, Currency.RussianRuble), 3)
+                .WithDenominationUpperLimitInPayout(new Denomination(5000, Currency.RussianRuble), 3);
             });
 
             itl.OnEvent += (sender, e) => Invoke(new MethodInvoker(delegate ()

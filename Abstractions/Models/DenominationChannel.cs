@@ -1,4 +1,6 @@
-﻿namespace Filuet.Hardware.CashAcceptors.Abstractions.Models
+﻿using Filuet.Infrastructure.Abstractions.Models;
+
+namespace Filuet.Hardware.CashAcceptors.Abstractions.Models
 {
     public class DenominationChannel
     {        

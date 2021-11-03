@@ -4,6 +4,7 @@ using Filuet.Hardware.CashAcceptors.Abstractions.Events;
 using Filuet.Hardware.CashAcceptors.Abstractions.Models;
 using Filuet.Hardware.CashAcceptors.Services.Events;
 using Filuet.Infrastructure.Abstractions.Business;
+using Filuet.Infrastructure.Abstractions.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

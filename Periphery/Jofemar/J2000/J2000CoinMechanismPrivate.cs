@@ -2,6 +2,7 @@
 using Filuet.Hardware.CashAcceptors.Abstractions.Events;
 using Filuet.Hardware.CashAcceptors.Abstractions.Models;
 using Filuet.Hardware.CashAcceptors.Periphery.Jofemar.Enums;
+using Filuet.Infrastructure.Abstractions.Models;
 using FTD2XX_NET;
 using System;
 using System.Linq;

@@ -10,6 +10,7 @@ using Filuet.Hardware.CashAcceptors.Abstractions.Events;
 using Filuet.Hardware.CashAcceptors.Abstractions.Models;
 using Filuet.Hardware.CashAcceptors.Common.Ssp;
 using Filuet.Infrastructure.Abstractions.Helpers;
+using Filuet.Infrastructure.Abstractions.Models;
 using ITLlib;
 
 namespace Filuet.Hardware.CashAcceptors.Periphery.ITL

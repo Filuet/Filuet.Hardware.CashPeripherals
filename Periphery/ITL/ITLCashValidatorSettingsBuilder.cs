@@ -1,5 +1,5 @@
-﻿using Filuet.Hardware.CashAcceptors.Abstractions.Models;
-using Filuet.Hardware.CashAcceptors.Periphery.ITL.Models;
+﻿using Filuet.Hardware.CashAcceptors.Periphery.ITL.Models;
+using Filuet.Infrastructure.Abstractions.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,7 +53,7 @@ namespace Filuet.Hardware.CashAcceptors.Periphery.ITL
             return this;
         }
 
-        public ITLCashValidatorSettingsBuilder WithBillUpperLimitInPayout(Denomination bill, ushort maxQtyThresholdInPayout)
+        public ITLCashValidatorSettingsBuilder WithDenominationUpperLimitInPayout(Denomination bill, ushort maxQtyThresholdInPayout)
         {
             if (_maxBillQtyInPayout < 3)
                 throw new ArgumentException("Too low upper limit of bills in the payout");

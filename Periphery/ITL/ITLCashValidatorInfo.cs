@@ -1,5 +1,5 @@
-﻿using Filuet.Hardware.CashAcceptors.Abstractions.Models;
-using Filuet.Hardware.CashAcceptors.Periphery.ITL.Models;
+﻿using Filuet.Hardware.CashAcceptors.Periphery.ITL.Models;
+using Filuet.Infrastructure.Abstractions.Models;
 using System.Collections.Generic;
 using System.Linq;
 
