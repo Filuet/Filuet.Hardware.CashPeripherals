@@ -728,7 +728,7 @@ namespace Filuet.Hardware.CashAcceptors.Periphery.ITL
             lock (_command)
             {
                 _command.CommandData[0] = SspCommand.SSP_CMD_SET_DENOMINATION_ROUTE;
-                _command.CommandData[1] = (byte)(route == CashRoute.Stacker ? 0x00 : 0x01);
+                _command.CommandData[1] = (byte)(route == CashRoute.Stacker ? 0x01 : 0x00);
 
                 // get the note as a byte array
                 byte[] b = BitConverter.GetBytes((int)note.Amount * _info.ValueMultiplier);
@@ -738,9 +738,8 @@ namespace Filuet.Hardware.CashAcceptors.Periphery.ITL
                 _command.CommandData[5] = b[3];
 
                 // send country code (protocol 6+)
-                _command.CommandData[6] = (byte)note.Currency.GetCode()[0];
-                _command.CommandData[7] = (byte)note.Currency.GetCode()[1];
-                _command.CommandData[8] = (byte)note.Currency.GetCode()[2];
+                byte[] currency = System.Text.Encoding.ASCII.GetBytes(note.Currency.GetCode());
+                currency.CopyTo(_command.CommandData, 6);
 
                 _command.CommandDataLength = 9;
 
