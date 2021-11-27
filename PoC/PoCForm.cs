@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading;
 using System.Windows.Forms;
 
 namespace PoC
@@ -20,7 +12,7 @@ namespace PoC
 
         private void PoCForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            deviceTesterControl1.PoCForm_FormClosing(this, e);
+            deviceSelector1.PoCForm_FormClosing(this, e);
 
             this.Visible = false;
 

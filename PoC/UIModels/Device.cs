@@ -2,7 +2,7 @@
 
 namespace PoC.UIModels
 {
-    internal class Device
+    public class Device
     {
         public DeviceType Type { get; set; }
 
